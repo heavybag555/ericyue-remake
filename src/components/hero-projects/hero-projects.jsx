@@ -10,6 +10,7 @@ const HeroProject = ({ project, index }) => {
   const router = useRouter();
   const { handleMouseEnter, handleMouseLeave, handleClick } = useCursorStore();
   const [onClicked, setOnClicked] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const isTablet = useMedia("(max-width: 992px)");
 
   const calcTop = 16 + index * 16;
@@ -128,13 +129,22 @@ const HeroProject = ({ project, index }) => {
             clickedInProject();
           }}
         >
-          <Image
-            src={project.img}
-            width={1200}
-            height={1200}
-            alt=""
-            className="max-h-[650px] h-full object-cover"
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: imgLoaded ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="h-full"
+          >
+            <Image
+              src={project.img}
+              width={1200}
+              height={1200}
+              alt=""
+              className="max-h-[650px] h-full object-cover"
+              onLoad={() => setImgLoaded(true)}
+              priority={index < 2}
+            />
+          </motion.div>
         </motion.figure>
 
         <motion.div
