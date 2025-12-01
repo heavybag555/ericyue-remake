@@ -20,68 +20,12 @@ const Info = () => {
 
         <ul className="">
           <div className="mb-4 flex flex-col items-start gap-[.01rem]">
-            <h2 className="normal-txt">Narrative & Feature</h2>
-            <h2 className="normal-txt">Grant Illes | WME</h2>
+            <h2 className="normal-txt">Contact</h2>
             <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              gilles@wmeagency.com
+              gsotomayor1101@gmail.com
             </p>
             <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              310.246.3318
-            </p>
-          </div>
-
-          <div className="mb-4 flex flex-col items-start gap-[.01rem]">
-            <h2 className="normal-txt">Commercial & Music</h2>
-            <h2 className="normal-txt">Shari Shankewitz | WME</h2>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              sshankewitz@wmeagency.com
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              310.246.3133
-            </p>
-          </div>
-
-          <div className="mb-4 flex flex-col items-start gap-[.01rem]">
-            <h2 className="normal-txt">Sarah Hurley | WME</h2>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              shurley@wmeagency.com
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              310.859.4454
-            </p>
-          </div>
-
-          <div className="mb-4 flex flex-col items-start gap-[.01rem]">
-            <h2 className="normal-txt">Studio</h2>
-
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              studio@giovannisotomayor.com
-            </p>
-          </div>
-
-          <div className="flex flex-col items-start gap-[.01rem]">
-            <h2 className="normal-txt">Select Press</h2>
-
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              Le Cinéma Club
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              American Cinematographer
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              British Cinematographer
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              Indiewire
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              Filmmaker Magazine
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              ICG Magazine
-            </p>
-            <p className="normal-txt cursor-pointer transition-all hover:opacity-50">
-              Focus Features
+              201.450.5446
             </p>
           </div>
         </ul>
@@ -89,9 +33,18 @@ const Info = () => {
 
       <section className="col-start-2 col-span-2 row-start-2 self-end max-lg:row-start-1 max-lg:col-start-1 max-lg:px-4 max-lg:py-3 max-lg:pr-16">
         <p className="normal-txt cursor-pointer select-none">
-          (b. New York, NY) a multi-disciplinary artist, cinematographer &
-          filmmaker who has lensed a variety of traditional narrative films,
-          time-based and screen-based projects.
+          (b. New York, NY) Giovanni Sotomayor is a New Jersey–born
+          photographer, cinematographer, and multimedia storyteller whose work
+          spans concert photography, editorial portraiture, and short-form
+          visual narratives. Rooted in the music and arts communities of NYC, he
+          blends documentary instinct with cinematic composition across his
+          photo practices.
+        </p>
+        <br />
+        <p className="normal-txt cursor-pointer select-none">
+          A former Publicity Director at WNYU, Giovanni has shaped visual
+          strategy, led multimedia campaigns, and collaborated with artists,
+          labels, and publications to craft authentic, narrative-driven content.
         </p>
       </section>
     </main>
