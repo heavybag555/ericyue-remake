@@ -3,6 +3,7 @@
 import Filters from "@/components/filters/filters";
 import ProjectGrid from "@/components/project-grid/project-grid";
 import ProjectList from "@/components/project-list/project-list";
+import ArchiveBackground from "@/components/archive-background/archive-background";
 import projectsData from "@/data/projectsData";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -126,12 +127,14 @@ const Archive = () => {
   const isTablet = useMedia("(max-width: 992px)");
   const [activeFilter, setActiveFilter] = useState(null);
   const [layout, setLayout] = useState("grid");
+  const [hoveredImage, setHoveredImage] = useState(null);
   const filteredProjects = activeFilter
     ? projectsData.filter((p) => p.category === activeFilter)
     : projectsData;
 
   return (
     <>
+      <ArchiveBackground hoveredImage={hoveredImage} />
       {!isTablet ? (
         <main className={` ${layout === "grid" ? "px-5 py-6" : "px-2 py-6"}`}>
           <section
@@ -143,9 +146,19 @@ const Archive = () => {
           >
             {filteredProjects.map((project, i) =>
               layout === "grid" ? (
-                <ProjectGrid key={i} project={project} router={router} />
+                <ProjectGrid
+                  key={i}
+                  project={project}
+                  router={router}
+                  setHoveredImage={setHoveredImage}
+                />
               ) : (
-                <ProjectList key={i} project={project} router={router} />
+                <ProjectList
+                  key={i}
+                  project={project}
+                  router={router}
+                  setHoveredImage={setHoveredImage}
+                />
               )
             )}
 

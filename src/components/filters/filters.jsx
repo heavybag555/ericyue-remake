@@ -7,7 +7,7 @@ const Filters = ({
   opacityAnimation,
   setFiltersVisible,
 }) => {
-  const categories = ["Film", "Commercial", "Music"];
+  const categories = ["Editorial", "Photography", "Music"];
 
   return (
     <motion.ul

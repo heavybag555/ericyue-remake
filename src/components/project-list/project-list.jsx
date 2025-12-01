@@ -1,12 +1,14 @@
 "use client";
 
-const ProjectList = ({ project, router }) => {
+const ProjectList = ({ project, router, setHoveredImage }) => {
   return (
     <div
       className="relative w-full px-4"
       onClick={() => {
         router.push("/projects/" + project.id);
       }}
+      onMouseEnter={() => setHoveredImage(project.img)}
+      onMouseLeave={() => setHoveredImage(null)}
     >
       <ul className="relative grid grid-cols-5 group">
         <div className="flex items-center">

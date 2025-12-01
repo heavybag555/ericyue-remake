@@ -29,3 +29,5 @@ const SmoothScrolling = () => {
 
 export default SmoothScrolling;
 
+
+

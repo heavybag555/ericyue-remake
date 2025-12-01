@@ -1,13 +1,15 @@
 "use client";
 import { motion } from "framer-motion";
 
-const ProjectGrid = ({ project, router }) => {
+const ProjectGrid = ({ project, router, setHoveredImage }) => {
   return (
     <motion.div
       className="h-[100px] cursor-pointer"
       onClick={() => {
         router.push("/projects/" + project.id);
       }}
+      onMouseEnter={() => setHoveredImage(project.img)}
+      onMouseLeave={() => setHoveredImage(null)}
     >
       <ul className="flex flex-col items-start justify-start mix-blend-exclusion ">
         <li className="normal-txt">{project.index}</li>

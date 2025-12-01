@@ -5,6 +5,7 @@ import projectsData from "@/data/projectsData";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useCursorStore, usePlayingVideoStore } from "@/store/zustand";
+import Image from "next/image";
 
 const formatTime = (seconds) => {
   const h = Math.floor(seconds / 3600);
@@ -18,15 +19,9 @@ const Details = ({ setDetailsVisible }) => {
     <>
       <div className="fixed bottom-0 left-0 px-5 pb-12 z-[100]">
         <ul>
-          <li className="normal-txt">Writer & Director: Jane Schoenbrun </li>
-          <li className="normal-txt">2024 | 100 min</li>
-          <li className="normal-txt">Distributed by A24</li>
-          <li className="normal-txt">Official Selection:</li>
-          <li className="normal-txt">2024 Sundance Film Festival – Midnight</li>
-          <li className="normal-txt">
-            2024 Berlin International Film Festival
-          </li>
-          <li className="normal-txt">2024 SXSW Film Festival</li>
+          {/* Placeholder details - in a real app these might come from project data */}
+          <li className="normal-txt">Photography by Giovanni Sotomayor</li>
+          <li className="normal-txt">2024</li>
         </ul>
       </div>
       <div
@@ -51,6 +46,11 @@ const ProjectsDetail = () => {
   const { setIsPlaying } = usePlayingVideoStore();
 
   useEffect(() => {
+    if (!project?.video) {
+        setIsPlaying(false);
+        return;
+    }
+
     const video = videoRef.current;
     if (!video) return;
     video.play();
@@ -65,7 +65,7 @@ const ProjectsDetail = () => {
     return () => {
       video.removeEventListener("timeupdate", updateTime);
     };
-  }, []);
+  }, [project]);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
@@ -100,15 +100,17 @@ const ProjectsDetail = () => {
       setIsFullscreen(false);
     }
   };
+
   useEffect(() => {
     handleMouseEnter("playVideo");
-
     return () => handleMouseLeave();
   }, []);
 
   if (!project) {
     return <div>Nothing to show at the moment.</div>;
   }
+
+  const hasVideo = !!project.video;
 
   return (
     <>
@@ -119,7 +121,7 @@ const ProjectsDetail = () => {
         >
           <ul className="relative grid grid-cols-5 max-lg:grid-cols-2 ">
             <div className="flex items-center max-lg:gap-4">
-              <a className="relative normal-txt max-lg:hidden">{videoTime}</a>
+              {hasVideo && <a className="relative normal-txt max-lg:hidden">{videoTime}</a>}
               <a className="normal-txt hidden max-lg:block">{project.index}</a>
               <a className="normal-txt hidden max-lg:block">{project.title}</a>
             </div>
@@ -142,27 +144,61 @@ const ProjectsDetail = () => {
           </div>
         </header>
 
-        <div className="fixed top-[35px] left-0 w-full h-[1px] bg-white-20 z-10 max-lg:bg-[#00000031]">
-          <div
-            className="h-full bg-white transition-all duration-200 ease-linear max-lg:bg-black"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
+        {hasVideo && (
+          <div className="fixed top-[35px] left-0 w-full h-[1px] bg-white-20 z-10 max-lg:bg-[#00000031]">
+            <div
+              className="h-full bg-white transition-all duration-200 ease-linear max-lg:bg-black"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        )}
 
         <section
-          className="fixed top-0 flex justify-center items-center w-full h-full cursor-none"
-          onMouseEnter={() => handleMouseEnter("playVideo")}
+          className={`w-full h-full ${hasVideo ? "fixed top-0 flex justify-center items-center cursor-none" : "pt-[60px] pb-[60px] overflow-y-auto min-h-screen flex flex-col items-center gap-4"}`}
+          onMouseEnter={() => handleMouseEnter(hasVideo ? "playVideo" : "default")}
           onMouseLeave={() => handleMouseLeave()}
         >
-          <video
-            ref={videoRef}
-            src={project.video}
-            autoPlay
-            loop
-            muted={isMuted}
-            className="w-full h-auto"
-            onClick={togglePlayPause}
-          />
+          {hasVideo ? (
+            <video
+              ref={videoRef}
+              src={project.video}
+              autoPlay
+              loop
+              muted={isMuted}
+              className="w-full h-auto"
+              onClick={togglePlayPause}
+            />
+          ) : (
+            <div className="w-full flex flex-col items-center gap-10 px-4">
+              {project.images && project.images.length > 0 ? (
+                project.images.map((imgSrc, idx) => (
+                  <div key={idx} className="relative w-full max-w-[1200px]">
+                    <Image
+                        src={imgSrc}
+                        alt={`${project.title} - ${idx + 1}`}
+                        width={1200}
+                        height={800}
+                        className="w-full h-auto object-contain"
+                        priority={idx === 0}
+                    />
+                  </div>
+                ))
+              ) : (
+                 project.img && (
+                    <div className="relative w-full max-w-[1200px]">
+                    <Image
+                        src={project.img}
+                        alt={project.title}
+                        width={1200}
+                        height={800}
+                        className="w-full h-auto object-contain"
+                        priority
+                    />
+                  </div>
+                 )
+              )}
+            </div>
+          )}
         </section>
 
         <footer
@@ -178,14 +214,16 @@ const ProjectsDetail = () => {
                 DETAILS
               </button>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="normal-txt" onClick={toggleFullscreen}>
-                Fullscreen
-              </button>
-              <button className="normal-txt" onClick={toggleMute}>
-                {isMuted ? "Unmute" : "Mute"}
-              </button>
-            </div>
+            {hasVideo && (
+              <div className="flex items-center gap-4">
+                <button className="normal-txt" onClick={toggleFullscreen}>
+                  Fullscreen
+                </button>
+                <button className="normal-txt" onClick={toggleMute}>
+                  {isMuted ? "Unmute" : "Mute"}
+                </button>
+              </div>
+            )}
           </ul>
         </footer>
       </div>
