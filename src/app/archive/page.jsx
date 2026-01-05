@@ -8,7 +8,8 @@ import HeroProject from "@/components/hero-projects/hero-projects";
 import projectsData from "@/data/projectsData";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useMedia } from "react-use";
 
 const opacityAnimation = {
@@ -92,11 +93,11 @@ const Nav = ({
           </ul>
         </nav>
       ) : (
-        <nav className="fixed bottom-[calc(var(--pageInsetBottom)+20px)] right-0 px-4 mix-blend-exclusion">
+        <nav className="fixed top-1/2 -translate-y-1/2 right-0 px-4 mix-blend-exclusion">
           <ul>
             <li className="flex flex-col items-end">
               <button
-                className={`mb-4 normal-txt text-end hover:opacity-50 max-lg:mb-3 
+                className={`normal-txt text-end hover:opacity-50 
               ${filtersVisible ? "opacity-50" : ""}`}
                 onClick={() => setFiltersVisible(!filtersVisible)}
               >
@@ -128,6 +129,14 @@ const Archive = () => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [layout, setLayout] = useState("grid");
   const [hoveredImage, setHoveredImage] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  
+  // Track mount state for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+  
   const filteredProjects = activeFilter
     ? projectsData.filter((p) => p.category === activeFilter)
     : projectsData;
@@ -179,29 +188,36 @@ const Archive = () => {
           </section>
         </main>
       ) : (
-        <main className="pt-[var(--pageInsetTop)] pb-[var(--footerReserve)]">
-          <div className="flex flex-col">
-            {filteredProjects.map((project, i) => (
-              <HeroProject
-                key={i}
-                project={project}
-                index={i}
-                topRightLabel="Close"
-                onTopRightClick={() => router.push("/")}
-                showTopRightOnFirstOnly={true}
-              />
-            ))}
-            <div className="h-screen" />
-          </div>
-          <Nav
-            activeFilter={activeFilter}
-            setActiveFilter={setActiveFilter}
-            layout={layout}
-            setLayout={setLayout}
-            router={router}
-            isTablet={isTablet}
-          />
-        </main>
+        <>
+          <main className="pt-[var(--pageInsetTop)] pb-[var(--footerReserve)]">
+            <div className="flex flex-col">
+              {filteredProjects.map((project, i) => (
+                <HeroProject
+                  key={i}
+                  project={project}
+                  index={i}
+                  topRightLabel="Close"
+                  onTopRightClick={() => router.push("/")}
+                  showTopRightOnFirstOnly={true}
+                />
+              ))}
+              <div className="h-screen" />
+            </div>
+          </main>
+          {/* Portal Nav to body to escape transform context from template */}
+          {mounted &&
+            createPortal(
+              <Nav
+                activeFilter={activeFilter}
+                setActiveFilter={setActiveFilter}
+                layout={layout}
+                setLayout={setLayout}
+                router={router}
+                isTablet={isTablet}
+              />,
+              document.body
+            )}
+        </>
       )}
     </>
   );

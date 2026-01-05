@@ -1,29 +1,40 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 const ArchiveBackground = ({ hoveredImage }) => {
   return (
-    <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
-      <AnimatePresence>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: -1,
+        backgroundColor: "#000",
+        pointerEvents: "none",
+      }}
+    >
+      <AnimatePresence mode="wait">
         {hoveredImage && (
-          <motion.div
+          <motion.img
             key={hoveredImage}
+            src={hoveredImage}
+            alt="Background"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="absolute inset-0 w-full h-full"
-          >
-            <Image
-              src={hoveredImage}
-              alt="Background"
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-            />
-          </motion.div>
+            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
         )}
       </AnimatePresence>
     </div>

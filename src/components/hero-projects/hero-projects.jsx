@@ -26,8 +26,14 @@ const HeroProject = ({
   const calcTop = index === 0 
     ? 'var(--pageInsetTop)' 
     : `calc(var(--pageInsetTop) + ${index * 16}px)`;
+  
+  // Desktop padding/margin (unchanged)
   const customPadding = index === 0 ? "108px 1rem 250px 1rem" : "5px";
   const customMargin = index === 0 ? 0 : "250px";
+  
+  // Tablet/mobile: consistent 16px horizontal padding, no cropping
+  const tabletPadding = "1rem 1rem 1rem 1rem";
+  const tabletMargin = "140px";
 
   const clickedInProject = () => {
     handleClick();
@@ -88,15 +94,15 @@ const HeroProject = ({
       </header>
 
       <section
-        className="h-fit px-4 flex items-center justify-center max-lg:!py-4 max-lg:!px-[5px] max-lg:!mb-35 relative z-0"
+        className="h-fit flex items-center justify-center relative z-0"
         style={{
-          padding: `${customPadding}`,
-          marginBottom: `${customMargin}`,
+          padding: isTablet ? tabletPadding : customPadding,
+          marginBottom: isTablet ? tabletMargin : customMargin,
         }}
       >
         <figure
           ref={imageContainerRef}
-          className="size-auto px-4 max-lg:px-3 cursor-none relative z-0"
+          className={`cursor-none relative z-0 ${isTablet ? "w-full" : "size-auto px-4"}`}
           onMouseEnter={
             !isTablet ? () => handleMouseEnter("projectHero") : undefined
           }
@@ -113,8 +119,9 @@ const HeroProject = ({
             height={800}
             inView
             inViewMargin="200px 0px -100px 0px"
-            className="w-[1200px] max-w-full"
-            imgClassName="w-full h-auto"
+            sizes={isTablet ? "(max-width: 992px) 100vw, 1200px" : undefined}
+            className={isTablet ? "w-full" : "w-[1200px] max-w-full"}
+            imgClassName={isTablet ? "w-full h-auto object-contain" : "w-full h-auto"}
           />
         </figure>
       </section>

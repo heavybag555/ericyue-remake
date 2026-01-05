@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import projectsData from "@/data/projectsData";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCursorStore, usePlayingVideoStore } from "@/store/zustand";
 import { motion } from "framer-motion";
 import SmoothImage from "@/components/smooth-image/smooth-image";
@@ -33,23 +34,12 @@ const AnimatedImage = ({ src, alt, priority, index }) => {
   );
 };
 
-const Details = ({ setDetailsVisible, project }) => {
+const DetailsOverlay = ({ onClick }) => {
   return (
-    <>
-      <div className="fixed bottom-[calc(var(--pageInsetBottom)+16.5px)] left-0 px-4 z-[100]">
-        <ul>
-          <li className="normal-txt">{project.index}</li>
-          <li className="normal-txt font-medium">{project.title}</li>
-          {project.author && <li className="normal-txt font-medium">{project.author}</li>}
-          <li className="normal-txt font-medium">{project.camera}</li>
-          <li className="normal-txt font-medium">{project.filmStock}</li>
-        </ul>
-      </div>
-      <div
-        className="fixed inset-0 w-screen h-screen bg-[#16161683] backdrop-blur-lg z-40"
-        onClick={() => setDetailsVisible(false)}
-      />
-    </>
+    <div
+      className="fixed inset-0 w-screen h-screen bg-black/60 backdrop-blur-xl z-40"
+      onClick={onClick}
+    />
   );
 };
 
@@ -58,6 +48,7 @@ const ProjectsDetail = () => {
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const project = projectsData.find((item) => item.id === String(slug));
   const router = useRouter();
   const videoRef = useRef(null);
@@ -65,6 +56,12 @@ const ProjectsDetail = () => {
   const [progressPercent, setProgressPercent] = useState(0);
   const { handleMouseEnter, handleMouseLeave, handleClick } = useCursorStore();
   const { setIsPlaying } = usePlayingVideoStore();
+
+  // Track mount state for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (!project?.video) {
@@ -222,34 +219,71 @@ const ProjectsDetail = () => {
             </div>
           )}
         </motion.section>
-
-        <footer
-          className="fixed bottom-[var(--pageInsetBottom)] right-0 w-full px-4 mix-blend-exclusion z-50"
-          onMouseEnter={() => handleMouseLeave()}
-        >
-          <ul className="relative flex justify-between">
-            <div className="flex items-center max-lg:gap-4">
-              <button
-                className={`normal-txt hover:text-gray-400 transition-colors ${detailsVisible ? '!text-gray-400' : ''}`}
-                onClick={() => setDetailsVisible(!detailsVisible)}
-              >
-                Details
-              </button>
-            </div>
-            {hasVideo && (
-              <div className="flex items-center gap-4">
-                <button className="normal-txt hover:text-gray-400 transition-colors" onClick={toggleFullscreen}>
-                  Fullscreen
-                </button>
-                <button className="normal-txt hover:text-gray-400 transition-colors" onClick={toggleMute}>
-                  {isMuted ? "Unmute" : "Mute"}
-                </button>
-              </div>
-            )}
-          </ul>
-        </footer>
       </div>
-      {detailsVisible && <Details setDetailsVisible={setDetailsVisible} project={project} />}
+
+      {/* Portal footer to body to escape transform context from template */}
+      {mounted &&
+        createPortal(
+          <>
+            {/* Blur overlay when details visible */}
+            {detailsVisible && <DetailsOverlay onClick={() => setDetailsVisible(false)} />}
+
+            {/* Fixed footer with Details button */}
+            <footer
+              className="fixed bottom-[var(--pageInsetBottom)] left-0 right-0 w-full px-4 z-50"
+              onMouseEnter={() => handleMouseLeave()}
+            >
+              <div className="flex justify-between items-end">
+                {/* Left side - Details button and info */}
+                <div className="flex flex-col">
+                  {/* Details info - shown when details visible */}
+                  <div
+                    className={`flex flex-col transition-all duration-300 ease-out overflow-hidden ${
+                      detailsVisible
+                        ? "opacity-100 max-h-[200px] mb-2"
+                        : "opacity-0 max-h-0 mb-0"
+                    }`}
+                  >
+                    <span className="normal-txt text-white/60">{project.index}</span>
+                    <span className="normal-txt">{project.title}</span>
+                    {project.author && <span className="normal-txt">{project.author}</span>}
+                    <span className="normal-txt">{project.camera}</span>
+                    <span className="normal-txt">{project.filmStock}</span>
+                  </div>
+
+                  {/* Details button */}
+                  <button
+                    className={`normal-txt text-left hover:text-gray-400 transition-colors mix-blend-exclusion ${
+                      detailsVisible ? "!text-gray-400" : ""
+                    }`}
+                    onClick={() => setDetailsVisible(!detailsVisible)}
+                  >
+                    Details
+                  </button>
+                </div>
+
+                {/* Right side - Video controls */}
+                {hasVideo && (
+                  <div className="flex items-center gap-4 mix-blend-exclusion">
+                    <button
+                      className="normal-txt hover:text-gray-400 transition-colors"
+                      onClick={toggleFullscreen}
+                    >
+                      Fullscreen
+                    </button>
+                    <button
+                      className="normal-txt hover:text-gray-400 transition-colors"
+                      onClick={toggleMute}
+                    >
+                      {isMuted ? "Unmute" : "Mute"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </footer>
+          </>,
+          document.body
+        )}
     </>
   );
 };

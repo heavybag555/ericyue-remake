@@ -234,7 +234,7 @@ const projectsData = [
     author: "STATIC Magazine",
     category: "Music",
     camera: "Digital",
-    filmStock: "Digital",
+    filmStock: undefined,
     img: "/update-photos/ARCHIVE - Digital - Lexa Gates for STATIC Magazine/SELECT LEXA.jpg",
     images: [
       "/update-photos/ARCHIVE - Digital - Lexa Gates for STATIC Magazine/SELECT LEXA.jpg",
@@ -292,7 +292,7 @@ const projectsData = [
     author: "STATIC Magazine",
     category: "Music",
     camera: "Digital",
-    filmStock: "Digital",
+    filmStock: undefined,
     img: "/update-photos/ARCHIVE- Digital - Danny Brown for STATIC Magazine/SELECT BROWN.jpg",
     images: [
       "/update-photos/ARCHIVE- Digital - Danny Brown for STATIC Magazine/SELECT BROWN.jpg",
@@ -315,7 +315,7 @@ const projectsData = [
     author: "STATIC Magazine",
     category: "Music",
     camera: "Digital",
-    filmStock: "Digital",
+    filmStock: undefined,
     img: "/update-photos/ARCHIVE- Digital - Flatbush Zombies for STATIC Magazine/SELECT FLATBUSH.jpg",
     images: [
       "/update-photos/ARCHIVE- Digital - Flatbush Zombies for STATIC Magazine/SELECT FLATBUSH.jpg",
@@ -333,7 +333,7 @@ const projectsData = [
     author: "STATIC Magazine",
     category: "Music",
     camera: "Digital",
-    filmStock: "Digital",
+    filmStock: undefined,
     img: "/update-photos/ARCHIVE- Digital- JPEGMAFIA for STATIC MAGAZINE/SELECT Jpegmafia.jpg",
     images: [
       "/update-photos/ARCHIVE- Digital- JPEGMAFIA for STATIC MAGAZINE/SELECT Jpegmafia.jpg",
@@ -351,7 +351,7 @@ const projectsData = [
     author: "STATIC Magazine",
     category: "Editorial",
     camera: "Digital",
-    filmStock: "Digital",
+    filmStock: undefined,
     img: "/update-photos/ARCHIVE- Digitial - Mike Jenkins for STATIC Magazine/Select.jpg",
     images: [
       "/update-photos/ARCHIVE- Digitial - Mike Jenkins for STATIC Magazine/Select.jpg",
