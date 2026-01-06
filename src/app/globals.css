@@ -49,6 +49,7 @@ body {
   color: var(--color-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 ::-webkit-scrollbar {
@@ -66,6 +67,8 @@ body {
   z-index: 1000;
   pointer-events: none;
   background: url("../../public/noise.gif");
+  will-change: auto;
+  transform: translateZ(0);
 }
 
 ::view-transition-old(root),

@@ -119,7 +119,7 @@ const HeroProject = ({
             height={800}
             inView
             inViewMargin="200px 0px -100px 0px"
-            sizes={isTablet ? "(max-width: 992px) 100vw, 1200px" : undefined}
+            sizes={isTablet ? "(max-width: 992px) 100vw, 1200px" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1200px"}
             className={isTablet ? "w-full" : "w-[1200px] max-w-full"}
             imgClassName={isTablet ? "w-full h-auto object-contain" : "w-full h-auto"}
           />

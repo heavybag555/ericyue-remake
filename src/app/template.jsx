@@ -1,12 +1,14 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 
 const Template = ({ children }) => {
   const pathname = usePathname();
   
   // Buttery smooth page transition - elegant fade with subtle movement
-  const pageTransition = {
+  // Memoized to prevent recreation on every render
+  const pageTransition = useMemo(() => ({
     initial: {
       opacity: 0,
       y: 6,
@@ -27,7 +29,7 @@ const Template = ({ children }) => {
       y: 0,
       filter: "blur(0px)",
     },
-  };
+  }), []);
 
   return (
     <AnimatePresence mode="sync">

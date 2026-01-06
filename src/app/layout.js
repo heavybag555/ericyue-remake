@@ -22,6 +22,11 @@ export const metadata = {
     locale: "en_US",
     type: "website",
   },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.giovannisotomayor.com'),
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {

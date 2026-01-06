@@ -28,6 +28,7 @@ const AnimatedImage = ({ src, alt, priority, index }) => {
       inViewMargin="200px 0px -100px 0px"
       delay={index === 0 ? 0.05 : 0}
       duration={0.95}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1200px"
       className="w-full max-w-[1200px]"
       imgClassName="w-full h-auto object-contain"
     />

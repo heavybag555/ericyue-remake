@@ -66,7 +66,7 @@ const SmoothImage = ({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{ willChange: "opacity, transform, filter" }}
+      style={shouldShow ? { willChange: "opacity, transform, filter" } : undefined}
     >
       <Image
         src={src}
@@ -75,9 +75,13 @@ const SmoothImage = ({
         width={fill ? undefined : width}
         height={fill ? undefined : height}
         fill={fill}
-        sizes={sizes}
+        sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1200px"}
         className={imgClassName}
         onLoadingComplete={() => setIsDecoded(true)}
+        loading={priority ? undefined : "lazy"}
+        quality={85}
+        unoptimized={false}
+        fetchPriority={priority ? "high" : "auto"}
       />
     </motion.div>
   );
