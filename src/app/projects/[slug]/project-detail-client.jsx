@@ -1,0 +1,279 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useCursorStore, usePlayingVideoStore } from "@/store/zustand";
+import { motion } from "framer-motion";
+import SmoothImage from "@/components/smooth-image/smooth-image";
+
+const formatTime = (seconds) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+};
+
+const AnimatedImage = ({ src, alt, priority, index }) => {
+  return (
+    <SmoothImage
+      src={src}
+      alt={alt}
+      priority={priority}
+      width={1200}
+      height={800}
+      inView
+      inViewMargin="200px 0px -100px 0px"
+      delay={index === 0 ? 0.05 : 0}
+      duration={0.95}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1200px"
+      className="w-full max-w-[1200px]"
+      imgClassName="w-full h-auto object-contain"
+    />
+  );
+};
+
+const DetailsOverlay = ({ onClick }) => {
+  return (
+    <div
+      className="fixed inset-0 w-screen h-screen bg-black/60 backdrop-blur-xl z-40"
+      onClick={onClick}
+    />
+  );
+};
+
+const ProjectDetailClient = ({ project }) => {
+  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const videoRef = useRef(null);
+  const [videoTime, setVideoTime] = useState("00:00:00");
+  const [progressPercent, setProgressPercent] = useState(0);
+  const { handleMouseEnter, handleMouseLeave, handleClick } = useCursorStore();
+  const { setIsPlaying } = usePlayingVideoStore();
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  useEffect(() => {
+    if (!project?.video) {
+      setIsPlaying(false);
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) return;
+    video.play();
+    setIsPlaying(true);
+
+    const updateTime = () => {
+      setVideoTime(formatTime(video.currentTime));
+      setProgressPercent((video.currentTime / video.duration) * 100);
+    };
+
+    video.addEventListener("timeupdate", updateTime);
+    return () => {
+      video.removeEventListener("timeupdate", updateTime);
+    };
+  }, [project, setIsPlaying]);
+
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
+
+  const toggleFullscreen = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (!document.fullscreenElement) {
+      video.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  if (!project) {
+    return <div>Nothing to show at the moment.</div>;
+  }
+
+  const hasVideo = !!project.video;
+
+  return (
+    <>
+      <div className="">
+        <header
+          className="fixed top-[var(--pageInsetTop)] right-0 w-full px-4 mix-blend-exclusion z-10"
+          onMouseEnter={() => handleMouseEnter("default")}
+        >
+          <ul className="relative grid grid-cols-5 max-lg:grid-cols-2 ">
+            <div className="flex items-center max-lg:gap-4">
+              {hasVideo && (
+                <a className="relative normal-txt max-lg:hidden">{videoTime}</a>
+              )}
+              <a className="normal-txt hidden max-lg:block">{project.index}</a>
+              <a className="normal-txt font-medium hidden max-lg:block">{project.title}</a>
+            </div>
+            <a className="normal-txt font-medium max-lg:hidden">{project.title}</a>
+            <a className="normal-txt font-medium">{project.author}</a>
+            <a className="normal-txt font-medium max-lg:hidden">{project.category}</a>
+            <a className="normal-txt font-medium max-lg:hidden">{project.camera}</a>
+          </ul>
+
+          <div className="fixed top-[var(--pageInsetTop)] right-0 px-4 flex justify-end cursor-default">
+            <button
+              className="normal-txt cursor-pointer select-none hover:text-gray-400 transition-colors"
+              onClick={() => {
+                router.back();
+                handleClick();
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </header>
+
+        {hasVideo && (
+          <div className="fixed top-[calc(var(--pageInsetTop)+20px)] left-0 w-full h-[1px] bg-white-20 z-10">
+            <div
+              className="h-full bg-white transition-all duration-200 ease-linear"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        )}
+
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className={`w-full h-full ${
+            hasVideo
+              ? "fixed top-0 flex justify-center items-center cursor-none"
+              : "pt-[calc(var(--pageInsetTop)+24px)] pb-[var(--footerReserve)] overflow-y-auto min-h-screen flex flex-col items-center gap-4"
+          }`}
+          onMouseEnter={() =>
+            handleMouseEnter(hasVideo ? "playVideo" : "default")
+          }
+          onMouseLeave={() => handleMouseLeave()}
+        >
+          {hasVideo ? (
+            <motion.video
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+              ref={videoRef}
+              src={project.video}
+              autoPlay
+              loop
+              muted={isMuted}
+              className="w-full h-auto will-change-transform"
+              onClick={togglePlayPause}
+            />
+          ) : (
+            <div className="w-full flex flex-col items-center gap-10 px-4">
+              {project.images && project.images.length > 0
+                ? project.images.map((imgSrc, idx) => (
+                    <AnimatedImage
+                      key={idx}
+                      src={imgSrc}
+                      alt={`${project.title} - ${idx + 1}`}
+                      priority={idx === 0}
+                      index={idx}
+                    />
+                  ))
+                : project.img && (
+                    <AnimatedImage
+                      src={project.img}
+                      alt={project.title}
+                      priority
+                      index={0}
+                    />
+                  )}
+            </div>
+          )}
+        </motion.section>
+      </div>
+
+      {mounted &&
+        createPortal(
+          <>
+            {detailsVisible && <DetailsOverlay onClick={() => setDetailsVisible(false)} />}
+
+            <footer
+              className="fixed bottom-[var(--pageInsetBottom)] left-0 right-0 w-full px-4 z-50"
+              onMouseEnter={() => handleMouseLeave()}
+            >
+              <div className="flex justify-between items-end">
+                <div className="flex flex-col">
+                  <div
+                    className={`flex flex-col transition-all duration-300 ease-out overflow-hidden ${
+                      detailsVisible
+                        ? "opacity-100 max-h-[200px] mb-2"
+                        : "opacity-0 max-h-0 mb-0"
+                    }`}
+                  >
+                    <span className="normal-txt text-white/60">{project.index}</span>
+                    <span className="normal-txt">{project.title}</span>
+                    {project.author && <span className="normal-txt">{project.author}</span>}
+                    <span className="normal-txt">{project.camera}</span>
+                    <span className="normal-txt">{project.filmStock}</span>
+                  </div>
+
+                  <button
+                    className={`normal-txt text-left hover:text-gray-400 transition-colors mix-blend-exclusion ${
+                      detailsVisible ? "!text-gray-400" : ""
+                    }`}
+                    onClick={() => setDetailsVisible(!detailsVisible)}
+                  >
+                    Details
+                  </button>
+                </div>
+
+                {hasVideo && (
+                  <div className="flex items-center gap-4 mix-blend-exclusion">
+                    <button
+                      className="normal-txt hover:text-gray-400 transition-colors"
+                      onClick={toggleFullscreen}
+                    >
+                      Fullscreen
+                    </button>
+                    <button
+                      className="normal-txt hover:text-gray-400 transition-colors"
+                      onClick={toggleMute}
+                    >
+                      {isMuted ? "Unmute" : "Mute"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </footer>
+          </>,
+          document.body
+        )}
+    </>
+  );
+};
+
+export default ProjectDetailClient;

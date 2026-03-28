@@ -1,18 +1,9 @@
-"use client";
-import HeroProject from "@/components/hero-projects/hero-projects";
-import { heroData } from "@/data/projectsData";
+import { getHeroProjects } from "@/sanity/queries";
+import HomeClient from "./home-client";
 
-const Home = () => {
-  return (
-    <main className="pt-[var(--pageInsetTop)] pb-[var(--footerReserve)]">
-      <div className="flex flex-col">
-        {heroData.map((project, i) => (
-          <HeroProject key={project.id || project.index} project={project} index={i} />
-        ))}
-        <div className="h-screen" />
-      </div>
-    </main>
-  );
-};
+export const revalidate = 60;
 
-export default Home;
+export default async function Home() {
+  const heroData = await getHeroProjects();
+  return <HomeClient heroData={heroData} />;
+}
