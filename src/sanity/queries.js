@@ -1,6 +1,6 @@
-import { client } from "./client";
+import { getClient } from "./client";
 import { urlFor } from "./image";
-import { projectId } from "./env";
+import { projectId, dataset } from "./env";
 
 const PROJECT_FIELDS = `
   _id,
@@ -26,6 +26,11 @@ async function safeFetch(query, params) {
     console.warn("[sanity] Project ID not configured — returning empty data. Set NEXT_PUBLIC_SANITY_PROJECT_ID in .env.local");
     return [];
   }
+  const client = getClient();
+  if (!client) {
+    console.warn("[sanity] Client could not be created — returning empty data.");
+    return [];
+  }
   try {
     return await client.fetch(query, params);
   } catch (err) {
@@ -46,7 +51,7 @@ function mapProject(doc) {
 
   const video =
     doc.video?.asset?._ref
-      ? `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${doc.video.asset._ref.replace("file-", "").replace(/-(?=[^-]*$)/, ".")}`
+      ? `https://cdn.sanity.io/files/${projectId}/${dataset}/${doc.video.asset._ref.replace("file-", "").replace(/-(?=[^-]*$)/, ".")}`
       : undefined;
 
   return {
@@ -82,6 +87,8 @@ export async function getProjectBySlug(slug) {
     console.warn("[sanity] Project ID not configured — returning null.");
     return null;
   }
+  const client = getClient();
+  if (!client) return null;
   try {
     const doc = await client.fetch(
       `*[_type == "project" && projectId == $slug][0] { ${PROJECT_FIELDS} }`,
